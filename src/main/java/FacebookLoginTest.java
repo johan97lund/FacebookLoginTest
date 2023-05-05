@@ -86,7 +86,7 @@ public class FacebookLoginTest {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            logger.error("Thread was interrupted");
+            logger.error("Thread was interrupted", e);
             System.exit(1);
         }
 
@@ -98,7 +98,7 @@ public class FacebookLoginTest {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-            logger.error("Thread was interrupted");
+            logger.error("Thread was interrupted", e);
             System.exit(1);
         }
 
