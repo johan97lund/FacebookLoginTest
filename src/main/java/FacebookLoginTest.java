@@ -21,24 +21,29 @@ public class FacebookLoginTest {
 
     static Logger logger = LoggerFactory.getLogger(FacebookLoginTest.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
+        logger.info("Logback initialized");
         logger.info("Starting the test");
 
         String email = null;
         String password = null;
         try {
+            logger.info("Reading email and password from config.json");
             // Read the email and password from config.json
             Gson gson = new Gson();
             JsonElement config = gson.fromJson(new FileReader("config.json"), JsonElement.class);
             email = config.getAsJsonObject().get("email").getAsString();
             password = config.getAsJsonObject().get("password").getAsString();
+            logger.info("Read successfully!");
         } catch (IOException e) {
             // Handle any exceptions that might occur while reading the file
-            e.printStackTrace();
+            logger.error("Could not read config.json", e);
+            System.exit(1);
         }
 
         WebDriver driver = null;
         try {
+            logger.info("Instantiating and launching ChromeDriver from my local machine.");
             // Set the path to the ChromeDriver executable
             System.setProperty("/users/johanlund/Downloads/Chromedriver_mac64\\chromedriver", "path/to/chromedriver");
 
@@ -50,14 +55,16 @@ public class FacebookLoginTest {
             // Launch ChromeDriver
             driver = new ChromeDriver(options);
             driver.manage().window().maximize();
+            logger.info("Launch successful!");
         } catch (WebDriverException e) {
             // Handle any exceptions that might occur while launching the ChromeDriver
-            e.printStackTrace();
+            logger.error("Could not launch ChromeDriver", e);
+            System.exit(1);
         }
 
 
         // Go to the Facebook login page
-        assert driver != null;
+        logger.info("Attempting to log in.");
         driver.get("https://www.facebook.com/login.php");
 
         WebElement button = driver.findElement(By.xpath("//button[@data-testid='cookie-policy-manage-dialog-accept-button']"));
@@ -76,17 +83,48 @@ public class FacebookLoginTest {
         loginButton.click();
 
         // Wait for the login process to complete
-        Thread.sleep(5000);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            logger.error("Thread was interrupted");
+            System.exit(1);
+        }
 
         // Profile menu click
         WebElement profilePic = driver.findElement(By.xpath("//*[@aria-label='Your profile']"));
         profilePic.click();
 
-        // Wait for the logout process to complete
-        Thread.sleep(5000);
 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            logger.error("Thread was interrupted");
+            System.exit(1);
+        }
+
+        try {
+            int i = 0;
+            boolean siteFound = false;
+            while (i < 4 && !siteFound) {
+                driver.navigate().refresh();
+                Thread.sleep(1000);
+                if (driver.getPageSource().contains("Joe Dogtown")) {
+                    siteFound = true;
+                    logger.info("The profile was found!");
+                }
+                i++;
+
+            }
+            if (!siteFound) {
+                logger.info("The profile was not found!");
+            }
+        } catch (Exception e) {
+            logger.error("Site or profile was not found", e);
+            System.exit(1);
+        }
         // Close the browser
+        logger.info("Test successful!");
         driver.quit();
     }
-    }
+}
 

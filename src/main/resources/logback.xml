@@ -1,11 +1,16 @@
 <configuration>
+
+    <!-- Appender to write logs to a file -->
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>logs/logback.log</file>
+        <file>testfile.log</file>
+        <append>true</append>
+        <immediateFlush>true</immediateFlush>
         <encoder>
-            <pattern>%date [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
+    <!-- Set the root logger level and add the FILE appender -->
     <root level="info">
         <appender-ref ref="FILE" />
     </root>
